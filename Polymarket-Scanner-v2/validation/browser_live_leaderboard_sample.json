@@ -1,0 +1,52 @@
+{
+  "retrieval_context": "Live production JSON retrieved through the browsing network layer during this build; not through the application container.",
+  "source_url": "https://data-api.polymarket.com/v1/leaderboard",
+  "scope": "Default leaderboard route only; no explicit filters or pagination parameters.",
+  "observed_item_keys": [
+    "rank",
+    "proxyWallet",
+    "userName",
+    "xUsername",
+    "verifiedBadge",
+    "vol",
+    "pnl",
+    "profileImage"
+  ],
+  "sample": [
+    {
+      "rank": "1",
+      "proxyWallet": "0xc2e7800b5af46e6093872b177b7a5e7f0563be51",
+      "userName": "beachboy4",
+      "xUsername": "",
+      "verifiedBadge": false,
+      "vol": 0,
+      "pnl": 163333.58073219744,
+      "profileImage": ""
+    },
+    {
+      "rank": "2",
+      "proxyWallet": "0x6d20c35f65d9899b6d6b74f8466e824580f9a165",
+      "userName": "Djdjdjekekek",
+      "xUsername": "",
+      "verifiedBadge": false,
+      "vol": 1447721.838457,
+      "pnl": 117758.43930374517,
+      "profileImage": ""
+    },
+    {
+      "rank": "3",
+      "proxyWallet": "0x84cfffc3f16dcc353094de30d4a45226eccd2f63",
+      "userName": "mooseborzoi",
+      "xUsername": "",
+      "verifiedBadge": false,
+      "vol": 721392.974457,
+      "pnl": 107398.7370627331,
+      "profileImage": "https://polymarket-upload.s3.us-east-2.amazonaws.com/profile-image-7634413-4dea3150-84ad-4278-9e45-d96e51769b7e.png"
+    }
+  ],
+  "limitations": [
+    "This is not evidence for offset pagination.",
+    "This is not evidence for positions, activity, trades, or closed-position schemas.",
+    "No response headers or rate-limit behavior were exposed by the browsing layer."
+  ]
+}

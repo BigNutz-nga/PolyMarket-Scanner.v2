@@ -1,0 +1,197 @@
+{
+  "run_at": "2026-08-02T03:48:31.947909+00:00",
+  "base_url": "https://data-api.polymarket.com",
+  "authentication_sent": false,
+  "endpoint_checks": {
+    "leaderboard": {
+      "page_one": {
+        "ok": false,
+        "path": "/v1/leaderboard",
+        "params": {
+          "timePeriod": "WEEK",
+          "orderBy": "PNL",
+          "category": "OVERALL",
+          "limit": 5,
+          "offset": 0
+        },
+        "network_error": "ConnectError: [Errno -3] Temporary failure in name resolution",
+        "elapsed_seconds": 0.00241
+      },
+      "page_two": {
+        "ok": false,
+        "path": "/v1/leaderboard",
+        "params": {
+          "timePeriod": "WEEK",
+          "orderBy": "PNL",
+          "category": "OVERALL",
+          "limit": 5,
+          "offset": 5
+        },
+        "network_error": "ConnectError: [Errno -3] Temporary failure in name resolution",
+        "elapsed_seconds": 5.006259
+      },
+      "pagination": {
+        "page_one_status": null,
+        "page_two_status": null,
+        "page_one_count": null,
+        "page_two_count": null,
+        "first_sample_duplicate_across_pages": false,
+        "offset_request_accepted": false
+      }
+    },
+    "positions": {
+      "wallet": "",
+      "page_one": {
+        "ok": false,
+        "path": "/positions",
+        "params": {
+          "user": "",
+          "limit": 2,
+          "offset": 0,
+          "sizeThreshold": 0,
+          "sortBy": "CURRENT",
+          "sortDirection": "DESC"
+        },
+        "network_error": "ConnectError: [Errno -3] Temporary failure in name resolution",
+        "elapsed_seconds": 5.006422
+      },
+      "page_two": {
+        "ok": false,
+        "path": "/positions",
+        "params": {
+          "user": "",
+          "limit": 2,
+          "offset": 2,
+          "sizeThreshold": 0,
+          "sortBy": "CURRENT",
+          "sortDirection": "DESC"
+        },
+        "network_error": "ConnectError: [Errno -3] Temporary failure in name resolution",
+        "elapsed_seconds": 0.001533
+      },
+      "pagination": {
+        "page_one_status": null,
+        "page_two_status": null,
+        "page_one_count": null,
+        "page_two_count": null,
+        "first_sample_duplicate_across_pages": false,
+        "offset_request_accepted": false
+      }
+    },
+    "activity_trades": {
+      "wallet": "",
+      "page_one": {
+        "ok": false,
+        "path": "/activity",
+        "params": {
+          "user": "",
+          "limit": 2,
+          "offset": 0,
+          "type": "TRADE",
+          "sortBy": "TIMESTAMP",
+          "sortDirection": "DESC"
+        },
+        "network_error": "ConnectError: [Errno -3] Temporary failure in name resolution",
+        "elapsed_seconds": 5.006126
+      },
+      "page_two": {
+        "ok": false,
+        "path": "/activity",
+        "params": {
+          "user": "",
+          "limit": 2,
+          "offset": 2,
+          "type": "TRADE",
+          "sortBy": "TIMESTAMP",
+          "sortDirection": "DESC"
+        },
+        "network_error": "ConnectError: [Errno -3] Temporary failure in name resolution",
+        "elapsed_seconds": 0.001622
+      },
+      "pagination": {
+        "page_one_status": null,
+        "page_two_status": null,
+        "page_one_count": null,
+        "page_two_count": null,
+        "first_sample_duplicate_across_pages": false,
+        "offset_request_accepted": false
+      }
+    },
+    "trades_fallback": {
+      "wallet": "",
+      "page_one": {
+        "ok": false,
+        "path": "/trades",
+        "params": {
+          "user": "",
+          "limit": 2,
+          "offset": 0
+        },
+        "network_error": "ConnectError: [Errno -3] Temporary failure in name resolution",
+        "elapsed_seconds": 5.006237
+      },
+      "page_two": {
+        "ok": false,
+        "path": "/trades",
+        "params": {
+          "user": "",
+          "limit": 2,
+          "offset": 2
+        },
+        "network_error": "ConnectError: [Errno -3] Temporary failure in name resolution",
+        "elapsed_seconds": 0.001553
+      },
+      "pagination": {
+        "page_one_status": null,
+        "page_two_status": null,
+        "page_one_count": null,
+        "page_two_count": null,
+        "first_sample_duplicate_across_pages": false,
+        "offset_request_accepted": false
+      }
+    },
+    "closed_positions": {
+      "wallet": "",
+      "page_one": {
+        "ok": false,
+        "path": "/closed-positions",
+        "params": {
+          "user": "",
+          "limit": 2,
+          "offset": 0,
+          "sortBy": "TIMESTAMP",
+          "sortDirection": "DESC"
+        },
+        "network_error": "ConnectError: [Errno -3] Temporary failure in name resolution",
+        "elapsed_seconds": 5.006115
+      },
+      "page_two": {
+        "ok": false,
+        "path": "/closed-positions",
+        "params": {
+          "user": "",
+          "limit": 2,
+          "offset": 2,
+          "sortBy": "TIMESTAMP",
+          "sortDirection": "DESC"
+        },
+        "network_error": "ConnectError: [Errno -3] Temporary failure in name resolution",
+        "elapsed_seconds": 0.00153
+      },
+      "pagination": {
+        "page_one_status": null,
+        "page_two_status": null,
+        "page_one_count": null,
+        "page_two_count": null,
+        "first_sample_duplicate_across_pages": false,
+        "offset_request_accepted": false
+      }
+    }
+  },
+  "overall_status": "failed",
+  "environment_error": "ConnectError: [Errno -3] Temporary failure in name resolution",
+  "rate_probe": {
+    "skipped": true,
+    "reason": "Use --probe-throttle to opt in to a read-only /positions burst test."
+  }
+}
