@@ -17,7 +17,17 @@ from rich.table import Table
 from backtest import EvidenceCriteria, day_start, run_study
 from dashboard import render_console, when, write_report_files
 from fees import FeeSchedule, hold_to_settlement, round_trip
-from kalshi_api import DEMO_REST_URL, DEMO_WS_URL, PROD_REST_URL, PROD_WS_URL, KalshiAPIError, KalshiSigner
+from kalshi_api import (
+    DEMO_REST_URL,
+    DEMO_WS_URL,
+    PROD_REST_URL,
+    PROD_WS_URL,
+    ClientSettings,
+    KalshiAPIError,
+    KalshiClient,
+    KalshiSigner,
+)
+from live_check import run_checks
 from recorder import Recorder, RecorderSettings
 from store import RecorderStore
 from strategy import StrategyConfig
@@ -86,6 +96,12 @@ def build_parser() -> argparse.ArgumentParser:
         help="Record market data even without API credentials (the model cannot run on such periods)",
     )
 
+    check = commands.add_parser("check", help="Verify live access, payload fields, and the index feed (read-only)")
+    check.add_argument("--series", default="KXBTC15M", help="Kalshi series ticker")
+    check.add_argument("--index", default="BRTI", help="CF Benchmarks index ID that settles the series")
+    check.add_argument("--demo", action="store_true", help="Use Kalshi's demo environment")
+    check.add_argument("--timeout", type=float, default=20.0, help="Seconds to wait for index ticks")
+
     report = commands.add_parser("report", help="Replay recorded data and write the dashboard")
     _add_common(report)
     report.add_argument("--output-dir", default="reports")
@@ -136,6 +152,34 @@ async def run_record(args: argparse.Namespace) -> int:
     )
     CONSOLE.print(f"Recording {args.series} and {args.index} into {Path(args.db).resolve()} (Ctrl+C to stop)")
     await Recorder(settings, signer=signer, console=CONSOLE).run()
+    return 0
+
+
+async def run_check(args: argparse.Namespace) -> int:
+    signer = KalshiSigner.from_env()
+    client = KalshiClient(ClientSettings(retries=1), base_url=DEMO_REST_URL if args.demo else PROD_REST_URL, signer=signer)
+    CONSOLE.print(f"Checking Kalshi access for {args.series} / {args.index} (read-only)...")
+    results = await run_checks(
+        client,
+        signer,
+        series_ticker=args.series,
+        index_id=args.index,
+        ws_url=DEMO_WS_URL if args.demo else PROD_WS_URL,
+        timeout_seconds=args.timeout,
+    )
+    table = Table(title="Kalshi live check")
+    table.add_column("Check")
+    table.add_column("Result")
+    table.add_column("Detail")
+    styles = {"pass": "green", "warn": "yellow", "skip": "yellow", "fail": "bold red"}
+    for result in results:
+        table.add_row(result.name, f"[{styles[result.status]}]{result.status.upper()}[/]", result.detail)
+    CONSOLE.print(table)
+    blocked = [result for result in results if result.status in {"fail", "skip"}]
+    if blocked:
+        CONSOLE.print("[bold red]Not ready to record.[/bold red] Fix the items above, then run the check again.")
+        return 1
+    CONSOLE.print("[green]Ready to record:[/green] python main.py record")
     return 0
 
 
@@ -220,6 +264,8 @@ def main() -> int:
     try:
         if args.command == "record":
             return asyncio.run(run_record(args))
+        if args.command == "check":
+            return asyncio.run(run_check(args))
         if args.command == "report":
             if args.split_date:
                 datetime.fromisoformat(args.split_date)

@@ -15,7 +15,7 @@ A 15-minute market compares **the simple average of the CF Benchmarks index (BRT
 
 | Component | Module | What it does |
 |---|---|---|
-| Market recorder | `recorder.py`, `kalshi_api.py`, `cf_feed.py` | Records open markets and targets, bid depth for both sides every 2 s, trades, final results, and every BRTI tick (stamped with the time this machine received it). |
+| Market recorder | `recorder.py`, `kalshi_api.py`, `cf_feed.py`, `live_check.py` | Records open markets and targets, bid depth for both sides every 2 s, trades, final results, and every BRTI tick (stamped with the time this machine received it). |
 | Probability model | `model.py` | Estimates P(YES) from the distance to the target, trailing realized volatility, time remaining, and the 60-second settlement average. |
 | Entry filter | `strategy.py` | Buys a side only if `(model probability − model-error margin) − worst acceptable price − taker fee ≥ minimum edge`. |
 | Fill simulator and exit comparison | `backtest.py` | Replays recorded data with no look-ahead. Orders fill after a delay against the next recorded book, limited by price and visible depth. Runs **hold to settlement** and **sell early when the edge is gone** side by side. |
@@ -47,6 +47,14 @@ export KALSHI_PRIVATE_KEY_PATH="$HOME/.kalshi/kalshi-key.pem"
 `.env.example` lists the same variables. `.gitignore` excludes `.env`, `*.pem`, `data/`, and `reports/`.
 
 ## Workflow
+
+### 0. Check live access (one minute)
+
+```bash
+python main.py check
+```
+
+Read-only. It reaches the series, open markets, orderbook and trades endpoints, verifies the raw payloads still have every field this project relies on, then opens the signed index feed and waits for a few BRTI ticks. It ends with **Ready to record** or names exactly what is blocking (network, credentials, a renamed field, no open markets right now).
 
 ### 1. Record (weeks, continuously)
 
@@ -130,10 +138,10 @@ The replay rounds each fee **up to the next cent per price level filled**, the c
 
 Verified in the build environment:
 
-- 50 unit and integration tests: fee arithmetic, settlement-window variance, volatility estimation, request signing (RSA-PSS verified with the public key), WebSocket handshake and subscription against a local server, orderbook normalization, latency and missed fills, daily stop, early exit, provisional settlement, evaluation sealing and logging, dashboard, and CLI.
+- 54 unit and integration tests: fee arithmetic, settlement-window variance, volatility estimation, request signing (RSA-PSS verified with the public key), WebSocket handshake and subscription against a local server, orderbook normalization, latency and missed fills, daily stop, early exit, provisional settlement, evaluation sealing and logging, dashboard, the live check, and CLI.
 - An end-to-end run on 4 days of **synthetic** data (384 markets, 172,800 book snapshots, 347,520 index ticks) to check replay speed (about 16 s for 3 days × 2 policies) and dashboard rendering. Those numbers are not evidence of anything about real markets.
 
-Not verified here: the build environment's network policy blocked `api.elections.kalshi.com`, so **no live Kalshi request was made**. Endpoint paths and field names (`orderbook_fp.yes_dollars`, `yes_bid_dollars`, `floor_strike`, `strike_type`, `cfbenchmarks_value`, `last_60s_windowed_average_15min`, the `fee_multiplier` series field) and the signing scheme come from Kalshi's published OpenAPI and AsyncAPI specifications. Run `python main.py record` for a few minutes, then `python main.py status`, to confirm live capture before relying on it.
+Not verified here: the build environment's network policy blocked `api.elections.kalshi.com`, so **no live Kalshi request was made**. Endpoint paths and field names (`orderbook_fp.yes_dollars`, `yes_bid_dollars`, `floor_strike`, `strike_type`, `cfbenchmarks_value`, `last_60s_windowed_average_15min`, the `fee_multiplier` series field) and the signing scheme come from Kalshi's published OpenAPI and AsyncAPI specifications. Run `python main.py check` on a machine that can reach Kalshi before relying on it.
 
 ## Tests
 

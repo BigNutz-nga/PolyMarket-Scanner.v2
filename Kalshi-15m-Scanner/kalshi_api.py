@@ -353,6 +353,10 @@ class KalshiClient:
             await asyncio.sleep(max(retry_after, min(10.0, 0.5 * (2**attempt)) + random.uniform(0.0, 0.25)))
         raise KalshiAPIError(f"GET {path} failed after {made} attempt(s): {last_error}")
 
+    async def get_json(self, path: str, params: Mapping[str, Any] | None = None) -> Any:
+        """Raw response body, for schema checks against the live API."""
+        return await self._get(path, params)
+
     async def get_series(self, series_ticker: str) -> dict[str, Any]:
         payload = await self._get(f"/series/{series_ticker}")
         series = payload.get("series") if isinstance(payload, Mapping) else None
