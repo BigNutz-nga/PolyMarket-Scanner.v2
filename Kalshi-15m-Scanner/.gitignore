@@ -1,0 +1,9 @@
+.env
+*.pem
+*.key
+data/
+reports/
+__pycache__/
+.pytest_cache/
+.ruff_cache/
+.venv/
