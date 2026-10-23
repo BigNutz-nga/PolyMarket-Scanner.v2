@@ -153,3 +153,26 @@ async def test_client_does_not_retry_client_errors() -> None:
         with pytest.raises(KalshiAPIError):
             await client.get_market("missing")
     assert calls == 1
+
+
+def test_ed25519_keys_sign_with_ed25519() -> None:
+    from cryptography.hazmat.primitives.asymmetric import ed25519
+
+    key = ed25519.Ed25519PrivateKey.generate()
+    pem = key.private_bytes(
+        serialization.Encoding.PEM, serialization.PrivateFormat.PKCS8, serialization.NoEncryption()
+    )
+    headers = KalshiSigner.from_pem("key-id", pem).headers("GET", "/trade-api/ws/v2", timestamp_ms=1_700_000_000_000)
+    key.public_key().verify(
+        base64.b64decode(headers["KALSHI-ACCESS-SIGNATURE"]), b"1700000000000GET/trade-api/ws/v2"
+    )
+
+
+def test_unsupported_key_type_is_rejected() -> None:
+    from cryptography.hazmat.primitives.asymmetric import ec
+
+    pem = ec.generate_private_key(ec.SECP256R1()).private_bytes(
+        serialization.Encoding.PEM, serialization.PrivateFormat.PKCS8, serialization.NoEncryption()
+    )
+    with pytest.raises(KalshiAPIError, match="RSA or Ed25519"):
+        KalshiSigner.from_pem("key-id", pem)

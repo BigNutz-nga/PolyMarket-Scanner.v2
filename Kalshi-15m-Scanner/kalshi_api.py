@@ -83,7 +83,7 @@ class KalshiAPIError(RuntimeError):
 
 
 class KalshiSigner:
-    """RSA-PSS (SHA-256) request signer.
+    """Request signer for Kalshi API keys: RSA-PSS (SHA-256) for RSA keys, Ed25519 for Ed25519 keys.
 
     Kalshi signs ``timestamp_ms + METHOD + path`` (path without query string)
     and expects ``KALSHI-ACCESS-KEY``, ``KALSHI-ACCESS-TIMESTAMP`` and
@@ -99,11 +99,14 @@ class KalshiSigner:
     @classmethod
     def from_pem(cls, key_id: str, pem: bytes, password: bytes | None = None) -> KalshiSigner:
         from cryptography.hazmat.primitives import serialization
+        from cryptography.hazmat.primitives.asymmetric import ed25519, rsa
 
         try:
             key = serialization.load_pem_private_key(pem, password=password)
         except (TypeError, ValueError) as exc:
             raise KalshiAPIError(f"Could not load Kalshi private key: {exc}") from exc
+        if not isinstance(key, (rsa.RSAPrivateKey, ed25519.Ed25519PrivateKey)):
+            raise KalshiAPIError("Kalshi API keys are RSA or Ed25519; this private key is neither")
         return cls(key_id, key)
 
     @classmethod
@@ -124,15 +127,18 @@ class KalshiSigner:
 
     def headers(self, method: str, path: str, *, timestamp_ms: int | None = None) -> dict[str, str]:
         from cryptography.hazmat.primitives import hashes
-        from cryptography.hazmat.primitives.asymmetric import padding
+        from cryptography.hazmat.primitives.asymmetric import ed25519, padding
 
         timestamp = str(timestamp_ms if timestamp_ms is not None else int(time.time() * 1000))
         message = f"{timestamp}{method.upper()}{path.split('?', 1)[0]}".encode()
-        signature = self._private_key.sign(
-            message,
-            padding.PSS(mgf=padding.MGF1(hashes.SHA256()), salt_length=padding.PSS.DIGEST_LENGTH),
-            hashes.SHA256(),
-        )
+        if isinstance(self._private_key, ed25519.Ed25519PrivateKey):
+            signature = self._private_key.sign(message)
+        else:
+            signature = self._private_key.sign(
+                message,
+                padding.PSS(mgf=padding.MGF1(hashes.SHA256()), salt_length=padding.PSS.DIGEST_LENGTH),
+                hashes.SHA256(),
+            )
         return {
             "KALSHI-ACCESS-KEY": self.key_id,
             "KALSHI-ACCESS-TIMESTAMP": timestamp,

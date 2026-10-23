@@ -138,10 +138,10 @@ The replay rounds each fee **up to the next cent per price level filled**, the c
 
 Verified in the build environment:
 
-- 54 unit and integration tests: fee arithmetic, settlement-window variance, volatility estimation, request signing (RSA-PSS verified with the public key), WebSocket handshake and subscription against a local server, orderbook normalization, latency and missed fills, daily stop, early exit, provisional settlement, evaluation sealing and logging, dashboard, the live check, and CLI.
+- 56 unit and integration tests: fee arithmetic, settlement-window variance, volatility estimation, request signing (RSA-PSS verified with the public key), WebSocket handshake and subscription against a local server, orderbook normalization, latency and missed fills, daily stop, early exit, provisional settlement, evaluation sealing and logging, dashboard, the live check, and CLI.
 - An end-to-end run on 4 days of **synthetic** data (384 markets, 172,800 book snapshots, 347,520 index ticks) to check replay speed (about 16 s for 3 days × 2 policies) and dashboard rendering. Those numbers are not evidence of anything about real markets.
 
-Not verified here: the build environment's network policy blocked `api.elections.kalshi.com`, so **no live Kalshi request was made**. Endpoint paths and field names (`orderbook_fp.yes_dollars`, `yes_bid_dollars`, `floor_strike`, `strike_type`, `cfbenchmarks_value`, `last_60s_windowed_average_15min`, the `fee_multiplier` series field) and the signing scheme come from Kalshi's published OpenAPI and AsyncAPI specifications. Run `python main.py check` on a machine that can reach Kalshi before relying on it.
+Not verified here: the build environment's network policy blocked `api.elections.kalshi.com`, so **no live Kalshi request was made**. Endpoint paths and field names (`orderbook_fp.yes_dollars`, `yes_bid_dollars`, `floor_strike`, `strike_type`, `cfbenchmarks_value`, `last_60s_windowed_average_15min`, the `fee_multiplier` series field) and the signing scheme (RSA-PSS for RSA keys, Ed25519 for Ed25519 keys) come from Kalshi's published OpenAPI and AsyncAPI specifications. Run `python main.py check` on a machine that can reach Kalshi before relying on it.
 
 ## Tests
 
